@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+    <head>
+        <title>dc.js leaflet marker</title>
+
+        <link rel="stylesheet" href="css/dc.css">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css">
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+        
+		<script src="js/d3.min.js"></script>
+        <script src="js/crossfilter.min.js"></script>
+        <script src="js/dc.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="js/color-brewer.js"></script>
+
+        <!-- <script src="../dist/leaflet-map/dc-leaflet.js"></script> -->
+
+        <!-- use src for testing -->
+        <script src="js/base-map-chart.js"></script>
+        <script src="js/base-leaflet-chart.js"></script>
+        <script src="js/leaflet-marker-chart.js"></script>
+        <script src="js/leaflet-choropleth-chart.js"></script>
+        <script src="js/leaflet-legend.js"></script>
+
+        <style>
+            #holder {
+              width:850px;
+              margin:20px auto;
+            }
+            #holder>div {
+              padding:30px 0;
+              clear:both;
+            }
+            .map {
+              width:760px;
+              position:fixed;
+              height:850px;
+			  border:solid;
+			  position:fixed;
+				min-width:100%;
+				min-height:100%;
+			}
+			}
+           
+          </style>
+    </head>
+    <body>
+
+        <!--<div id="holder">-->
+            <div id="demo1">
+                
+                <div class="map"></div>
+                
+            </div>
+
+         
+        <script>
+		
+		       var map;
+        /*     Markers      */
+
+        d3.json("file/test.json", function(data) {
+		var demo=data.items;
+          drawMarkerSelect(demo);
+        
+        });
+
+        function drawMarkerSelect(demo) { 
+          var xf = crossfilter(demo);
+          var groupname = "marker-select";
+          var facilities = xf.dimension(function(d) { return d.LAT,d.LON; });
+          var facilitiesGroup = facilities.group().reduceCount();
+
+          var marker = dc.leafletMarkerChart("#demo1 .map",groupname)
+              .dimension(facilities)
+              .group(facilitiesGroup)
+              .width(600)
+              .height(400)			  
+              .fitOnRender(true)
+              .fitOnRedraw(true)
+              .popupOnHover(true)
+              .cluster(true);
+
+          var types = xf.dimension(function(d) { return d.DISTRICT; });
+          var typesGroup = types.group().reduceCount();
+
+          
+
+          dc.renderAll(groupname);
+          return {marker: marker};
+        }
+
+    
+        </script>
+    </body>
+</html>
